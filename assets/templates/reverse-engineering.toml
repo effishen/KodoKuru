@@ -1,0 +1,25 @@
+id = "reverse-engineering"
+name = "Reverse engineering"
+description = "Investigator-led analysis of binaries, firmware and protocols in an isolated VM with RE tools."
+lead_role = "investigator"
+roles = ["investigator", "reverser", "writer"]
+initial_agents = ["reverser"]
+workspace_prompt = "This workspace is a reverse-engineering investigation. Samples go in `samples/` (treat as untrusted), scripts in `scripts/`, findings in `notes/`."
+
+[settings]
+command_policy = "auto"
+default_environment = "re"
+
+[[environment]]
+name = "re"
+kind = "lima"
+description = "Ubuntu LTS VM with reverse-engineering tools."
+cpus = 4
+memory = "8GiB"
+disk = "60GiB"
+network = false
+provision = """
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get install -y build-essential git curl file binutils binwalk radare2 xxd python3 python3-pip gdb-multiarch squashfs-tools p7zip-full
+"""

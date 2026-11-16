@@ -1,0 +1,25 @@
+id = "software-dev"
+name = "Software development"
+description = "Architect-led team with developers and independent QA, working in a Linux VM."
+lead_role = "architect"
+roles = ["architect", "developer", "qa", "writer"]
+initial_agents = ["developer", "qa"]
+workspace_prompt = "This workspace builds software. Source code lives in `src/` unless the design says otherwise. Use git in the workspace files for history."
+
+[settings]
+command_policy = "auto"
+team_policy = "auto"
+default_environment = "dev"
+
+[[environment]]
+name = "dev"
+kind = "lima"
+description = "Ubuntu LTS development VM with build tools."
+cpus = 4
+memory = "8GiB"
+disk = "60GiB"
+provision = """
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get install -y build-essential git curl ca-certificates python3 python3-pip python3-venv pkg-config
+"""

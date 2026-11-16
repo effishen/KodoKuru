@@ -1,0 +1,5 @@
+id = "general"
+name = "General"
+description = "An empty workspace with a general-purpose lead that builds a team when it needs one."
+lead_role = "assistant"
+roles = ["assistant", "developer", "qa", "writer", "narrator-voice"]
