@@ -317,7 +317,8 @@ pub struct EnvRecipe {
     /// Keep the VM disk inside the workspace (exact state travels with it).
     #[serde(default = "yes")]
     pub keep_disk: bool,
-    /// Allow outbound internet from the guest.
+    /// Allow outbound internet from the guest. NOT ENFORCED YET: recorded in
+    /// the recipe for when network isolation lands; VMs currently have network.
     #[serde(default = "yes")]
     pub network: bool,
 }

@@ -118,7 +118,7 @@ impl Tool for EnvDefine {
             "memory": {"type": "string", "description": "e.g. 4GiB"},
             "disk": {"type": "string", "description": "e.g. 40GiB"},
             "provision": {"type": "string", "description": "bash script run as root on first boot"},
-            "network": {"type": "boolean"}
+            "network": {"type": "boolean", "description": "intended outbound network access (not enforced yet)"}
         }})
     }
     async fn approval(&self, ctx: &ToolCtx, a: &Value) -> Option<String> {

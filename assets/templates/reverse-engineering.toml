@@ -17,7 +17,6 @@ description = "Ubuntu LTS VM with reverse-engineering tools."
 cpus = 4
 memory = "8GiB"
 disk = "60GiB"
-network = false
 provision = """
 export DEBIAN_FRONTEND=noninteractive
 apt-get update

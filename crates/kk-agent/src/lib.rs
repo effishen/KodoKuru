@@ -19,7 +19,7 @@ use serde::Serialize;
 #[serde(tag = "live", rename_all = "snake_case")]
 pub enum Live {
     /// A persisted event.
-    Event { event: Event },
+    Event { event: Box<Event> },
     /// A streamed fragment of an assistant turn (not persisted).
     Delta {
         agent_id: String,

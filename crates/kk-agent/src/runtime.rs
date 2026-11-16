@@ -151,17 +151,18 @@ impl Runtime {
             settings.default_engine.clone(),
             engines.default_chat.clone(),
         ];
-        for id in candidates.iter().filter(|s| !s.is_empty()) {
-            match engines.get(id) {
+        // The most specific configured choice wins; a bad one is an error, not a fallback.
+        if let Some(id) = candidates.iter().find(|s| !s.is_empty()) {
+            return match engines.get(id) {
                 Some(e) if e.kind == EngineKind::Chat => {
                     if !settings.engine_allowed(&e.id) {
                         bail!("engine {:?} is not allowed in this workspace", e.id);
                     }
-                    return Ok(e.clone());
+                    Ok(e.clone())
                 }
                 Some(_) => bail!("engine {id:?} is not a chat engine"),
                 None => bail!("engine {id:?} is not defined in engines.toml"),
-            }
+            };
         }
         engines
             .engines
@@ -278,7 +279,7 @@ impl Runtime {
 
     pub async fn workspaces(&self) -> Vec<Arc<Workspace>> {
         let mut v: Vec<_> = self.workspaces.read().await.values().cloned().collect();
-        v.sort_by(|a, b| b.created_at().cmp(&a.created_at()));
+        v.sort_by_key(|w| std::cmp::Reverse(w.created_at()));
         v
     }
 

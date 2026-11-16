@@ -10,6 +10,14 @@ use std::time::{Duration, Instant};
 
 use crate::{setup, update, Locations, StartOpts};
 
+/// println! that ignores a closed stdout (e.g. `kodokuru status | head -1`).
+macro_rules! say {
+    ($($t:tt)*) => {{
+        use std::io::Write as _;
+        let _ = writeln!(std::io::stdout(), $($t)*);
+    }};
+}
+
 #[derive(Serialize, Deserialize)]
 struct RunInfo {
     pid: u32,
@@ -43,19 +51,19 @@ fn url(bind: &str, port: u16, tls: bool) -> String {
 }
 
 fn print_banner(home: &kk_home::Home, info: &RunInfo) {
-    println!("KodoKuru {} is running (pid {})", info.version, info.pid);
-    println!("  Open:  {}", info.url);
+    say!("KodoKuru {} is running (pid {})", info.version, info.pid);
+    say!("  Open:  {}", info.url);
     if info.tls && !info.fingerprint.is_empty() {
-        println!("  TLS:   self-signed certificate, SHA-256 {}", info.fingerprint);
+        say!("  TLS:   self-signed certificate, SHA-256 {}", info.fingerprint);
     }
-    println!("  Home:  {}", home.root.display());
+    say!("  Home:  {}", home.root.display());
     if let Ok(code) = std::fs::read_to_string(home.run_dir().join("setup-code")) {
         if !kk_home::vault::exists(&home.vault_path()) {
-            println!("\n  First-time setup code: {}", code.trim());
-            println!("  Open the page above and enter this code to choose your password.");
+            say!("\n  First-time setup code: {}", code.trim());
+            say!("  Open the page above and enter this code to choose your password.");
         }
     } else if kk_home::vault::exists(&home.vault_path()) {
-        println!("  Log in on the page to unlock; queued agent work resumes after that.");
+        say!("  Log in on the page to unlock; queued agent work resumes after that.");
     }
 }
 

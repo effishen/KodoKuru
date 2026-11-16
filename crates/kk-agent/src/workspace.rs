@@ -139,7 +139,7 @@ impl Workspace {
     pub fn emit(&self, agent_id: Option<&str>, kind: EventKind) -> Result<Event> {
         let visibility = self.visibility(agent_id, &kind);
         let ev = self.store().append(NewEvent { agent_id: agent_id.map(str::to_string), visibility, kind })?;
-        self.rt.publish(Some(self.id()), Live::Event { event: ev.clone() });
+        self.rt.publish(Some(self.id()), Live::Event { event: Box::new(ev.clone()) });
         Ok(ev)
     }
 

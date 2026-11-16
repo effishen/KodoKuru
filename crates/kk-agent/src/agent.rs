@@ -26,7 +26,7 @@ use crate::workspace::{RunCtl, StopReason, Workspace};
 use crate::Live;
 
 const MAX_TOOL_OUTPUT: usize = 60_000;
-const MAX_CHECKLIST_NUDGES: u32 = 2;
+const MAX_CHECKLIST_NUDGES: u32 = 1;
 const MAX_SELF_CHECKS: u32 = 2;
 
 enum Exit {

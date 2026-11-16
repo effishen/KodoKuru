@@ -106,10 +106,11 @@ pub fn to_messages(h: &History, agents: &[AgentInfo], text_mode: bool) -> Vec<Ch
                 }
                 open_calls = tool_calls.clone();
             }
-            EventKind::ToolResult { call_id, name, output, .. } => {
-                if open_calls.iter().any(|c| &c.id == call_id) && answered.insert(call_id.clone()) {
-                    push_tool_result(&mut out, call_id, name, output, text_mode);
-                }
+            // Results for calls we know about, once each; orphans are dropped.
+            EventKind::ToolResult { call_id, name, output, .. }
+                if open_calls.iter().any(|c| &c.id == call_id) && answered.insert(call_id.clone()) =>
+            {
+                push_tool_result(&mut out, call_id, name, output, text_mode);
             }
             _ => {}
         }
