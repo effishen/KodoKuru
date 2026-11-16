@@ -136,6 +136,16 @@ pub fn check(cache: &Path) -> Report {
         vm_only: true,
     });
 
+    let ssh = ["ssh", "ssh-keygen"].iter().all(|b| which(b).is_some());
+    checks.push(Check {
+        name: "ssh".into(),
+        ok: ssh,
+        detail: if ssh { "ssh and ssh-keygen found".into() } else { "ssh/ssh-keygen not found (Lima needs them)".into() },
+        apt: Some("openssh-client".into()),
+        hint: Some("sudo apt-get install openssh-client".into()),
+        vm_only: true,
+    });
+
     let lima = crate::lima::limactl_path(cache);
     checks.push(Check {
         name: "lima".into(),

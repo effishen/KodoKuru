@@ -1,0 +1,36 @@
+[package]
+name = "kodokuru"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "A local LLM harness: role-based agent teams in isolated, portable workspaces."
+
+[[bin]]
+name = "kodokuru"
+path = "src/main.rs"
+
+[dependencies]
+kk-core.workspace = true
+kk-home.workspace = true
+kk-env.workspace = true
+kk-agent.workspace = true
+kk-server.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+tracing-appender.workspace = true
+reqwest.workspace = true
+sha2.workspace = true
+hex.workspace = true
+tar.workspace = true
+flate2.workspace = true
+libc.workspace = true
+rand.workspace = true
+chrono.workspace = true
+
+[dev-dependencies]
+tempfile = "3"

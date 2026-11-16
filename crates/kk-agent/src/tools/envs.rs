@@ -113,7 +113,7 @@ impl Tool for EnvDefine {
             "name": {"type": "string"},
             "kind": {"type": "string", "enum": ["lima", "host", "none"]},
             "description": {"type": "string"},
-            "image": {"type": "string", "description": "Lima template, default template://ubuntu-lts"},
+            "image": {"type": "string", "description": "Lima template, default template:ubuntu-lts"},
             "cpus": {"type": "integer"},
             "memory": {"type": "string", "description": "e.g. 4GiB"},
             "disk": {"type": "string", "description": "e.g. 40GiB"},

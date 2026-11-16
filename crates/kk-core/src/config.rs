@@ -302,7 +302,7 @@ pub struct EnvRecipe {
     pub kind: EnvKind,
     #[serde(default)]
     pub description: String,
-    /// Lima base template, e.g. `template://ubuntu-lts`.
+    /// Lima base template, e.g. `template:ubuntu-lts` or `template:debian-12`.
     #[serde(default = "default_image")]
     pub image: String,
     #[serde(default = "default_cpus")]
@@ -323,7 +323,7 @@ pub struct EnvRecipe {
 }
 
 fn default_image() -> String {
-    "template://ubuntu-lts".into()
+    "template:ubuntu-lts".into()
 }
 fn default_cpus() -> u32 {
     2

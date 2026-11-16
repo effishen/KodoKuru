@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/kk-core", "crates/kk-home", "crates/kk-store", "crates/kk-llm", "crates/kk-env", "crates/kk-agent"]
+members = ["crates/*"]
 
 [workspace.package]
 version = "0.1.0"
@@ -33,7 +33,7 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-appender = "0.2"
 rusqlite = { version = "0.32", features = ["bundled"] }
-reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls", "rustls-tls-native-roots"] }
 argon2 = "0.5"
 chacha20poly1305 = "0.10"
 rand = "0.8"
@@ -46,8 +46,9 @@ walkdir = "2"
 globset = "0.4"
 axum = { version = "0.8", features = ["ws"] }
 axum-extra = { version = "0.10", features = ["cookie"] }
-axum-server = { version = "0.7", features = ["tls-rustls"] }
-rcgen = "0.13"
+axum-server = { version = "0.7", features = ["tls-rustls-no-provider"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12", "logging"] }
+rcgen = { version = "0.13", default-features = false, features = ["ring", "pem", "crypto"] }
 rust-embed = "8"
 mime_guess = "2"
 clap = { version = "4", features = ["derive"] }
@@ -58,3 +59,9 @@ flate2 = "1"
 [profile.release]
 lto = "thin"
 strip = true
+
+# Keep password hashing fast in debug builds (login would take seconds).
+[profile.dev.package.argon2]
+opt-level = 3
+[profile.dev.package.blake2]
+opt-level = 3
