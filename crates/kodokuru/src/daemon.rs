@@ -79,7 +79,7 @@ pub fn start(loc: &Locations, o: StartOpts) -> Result<()> {
     if !o.detached_child {
         let rt = tokio::runtime::Runtime::new()?;
         // 1. Update first, so the new version does the rest.
-        if !o.no_update && home.settings.auto_update && std::env::var_os("KODOKURU_UPDATED").is_none() {
+        if !loc.no_update && home.settings.auto_update && std::env::var_os("KODOKURU_UPDATED").is_none() {
             match rt.block_on(update::check_and_install(&home.settings.update_repo, false)) {
                 Ok(update::Outcome::Updated(v)) => {
                     println!("Updated KodoKuru to {v}; restarting…");
@@ -91,9 +91,9 @@ pub fn start(loc: &Locations, o: StartOpts) -> Result<()> {
             }
         }
         // 2. Prerequisites (interactive fixes need a terminal, so do them here).
-        if !o.no_doctor {
-            let interactive = std::io::stdin().is_terminal();
-            rt.block_on(setup::doctor(&home, false, interactive))?;
+        if !loc.no_doctor {
+            let mode = if std::io::stdin().is_terminal() { setup::Mode::Interactive } else { setup::Mode::Auto };
+            rt.block_on(setup::doctor(&home, mode))?;
         }
         drop(rt);
     }

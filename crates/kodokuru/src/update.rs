@@ -36,7 +36,12 @@ pub async fn check_and_install(repo: &str, force: bool) -> Result<Outcome> {
     let exe = std::env::current_exe()?.canonicalize()?;
     let exe_s = exe.to_string_lossy();
     if !force && (exe_s.contains("/target/debug/") || exe_s.contains("/target/release/")) {
-        return Ok(Outcome::Skipped("running from a source build (use git pull && cargo build)".into()));
+        let why = if std::env::var_os("KODOKURU_LAUNCHER").is_some() {
+            "source checkout — kodokuru.sh keeps it up to date with git pull and rebuilds"
+        } else {
+            "running from a source build (use ./kodokuru.sh, or git pull && cargo build)"
+        };
+        return Ok(Outcome::Skipped(why.into()));
     }
     let http = reqwest::Client::builder()
         .user_agent(format!("kodokuru/{}", kk_core::VERSION))

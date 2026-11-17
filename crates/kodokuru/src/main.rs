@@ -26,6 +26,12 @@ pub struct Locations {
     /// Cache folder (VM images, downloads). Default: $KODOKURU_CACHE or ~/.cache/kodokuru
     #[arg(long, global = true)]
     cache: Option<PathBuf>,
+    /// Skip update checks (GitHub release for the binary; git pull in kodokuru.sh)
+    #[arg(long, global = true)]
+    pub no_update: bool,
+    /// Skip prerequisite checks and installation (here and in kodokuru.sh)
+    #[arg(long, global = true)]
+    pub no_doctor: bool,
 }
 
 impl Locations {
@@ -54,12 +60,6 @@ pub struct StartOpts {
     /// Serve plain HTTP (only behind a TLS reverse proxy or on localhost)
     #[arg(long)]
     no_tls: bool,
-    /// Skip the update check
-    #[arg(long)]
-    no_update: bool,
-    /// Skip the prerequisite check
-    #[arg(long)]
-    no_doctor: bool,
     /// Internal: this process is the detached server
     #[arg(long, hide = true)]
     detached_child: bool,
@@ -108,7 +108,7 @@ fn main() -> Result<()> {
         Cmd::Doctor { fix } => {
             let home = loc.open()?;
             let rt = tokio::runtime::Runtime::new()?;
-            rt.block_on(setup::doctor(&home, fix, true))
+            rt.block_on(setup::doctor(&home, if fix { setup::Mode::Fix } else { setup::Mode::Report }))
         }
         Cmd::Update => {
             let home = loc.open()?;
