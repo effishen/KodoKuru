@@ -1,0 +1,25 @@
+[package]
+name = "kk-env"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+kk-core.workspace = true
+kk-home.workspace = true
+anyhow.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tokio-util.workspace = true
+tracing.workspace = true
+libc.workspace = true
+reqwest.workspace = true
+sha2.workspace = true
+hex.workspace = true
+tar.workspace = true
+flate2.workspace = true
+
+[dev-dependencies]
+tempfile = "3"

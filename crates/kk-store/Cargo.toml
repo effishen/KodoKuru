@@ -1,0 +1,20 @@
+[package]
+name = "kk-store"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+kk-core.workspace = true
+kk-home.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+toml.workspace = true
+rusqlite.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile = "3"

@@ -1,0 +1,10 @@
+id = "game-master"
+name = "LLM game"
+description = "A game master runs an interactive story; a continuity keeper checks it against the world state."
+lead_role = "game-master"
+roles = ["game-master", "continuity", "narrator-voice"]
+workspace_prompt = "This workspace is an interactive game. The player is the user. World state is the source of truth."
+
+[settings]
+command_policy = "ask"
+max_agents = 4

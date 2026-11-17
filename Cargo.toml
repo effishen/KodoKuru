@@ -1,0 +1,67 @@
+[workspace]
+resolver = "2"
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "GPL-3.0-or-later"
+repository = "https://github.com/effishen/KodoKuru"
+rust-version = "1.89"
+
+[workspace.dependencies]
+kk-core = { path = "crates/kk-core" }
+kk-home = { path = "crates/kk-home" }
+kk-store = { path = "crates/kk-store" }
+kk-llm = { path = "crates/kk-llm" }
+kk-env = { path = "crates/kk-env" }
+kk-agent = { path = "crates/kk-agent" }
+kk-server = { path = "crates/kk-server" }
+
+anyhow = "1"
+thiserror = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+tokio = { version = "1", features = ["full"] }
+tokio-util = "0.7"
+futures = "0.3"
+async-trait = "0.1"
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-appender = "0.2"
+rusqlite = { version = "0.32", features = ["bundled"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls", "rustls-tls-native-roots"] }
+argon2 = "0.5"
+chacha20poly1305 = "0.10"
+rand = "0.8"
+zeroize = "1"
+base64 = "0.22"
+sha2 = "0.10"
+hex = "0.4"
+regex = "1"
+walkdir = "2"
+globset = "0.4"
+axum = { version = "0.8", features = ["ws"] }
+axum-extra = { version = "0.10", features = ["cookie"] }
+axum-server = { version = "0.7", features = ["tls-rustls-no-provider"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12", "logging"] }
+rcgen = { version = "0.13", default-features = false, features = ["ring", "pem", "crypto"] }
+rust-embed = "8"
+mime_guess = "2"
+clap = { version = "4", features = ["derive"] }
+libc = "0.2"
+tar = "0.4"
+flate2 = "1"
+
+[profile.release]
+lto = "thin"
+strip = true
+
+# Keep password hashing fast in debug builds (login would take seconds).
+[profile.dev.package.argon2]
+opt-level = 3
+[profile.dev.package.blake2]
+opt-level = 3

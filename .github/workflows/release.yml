@@ -1,0 +1,53 @@
+name: Release
+
+# Push a tag like v0.2.0 to publish static Linux binaries. Running copies of
+# KodoKuru pick them up on their next start (`kodokuru update` to do it now).
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            arch: x86_64
+          - runner: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-musl
+            arch: aarch64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check version matches tag
+        run: |
+          v=$(grep -m1 '^version' Cargo.toml | cut -d'"' -f2)
+          test "v$v" = "${GITHUB_REF_NAME}" || { echo "Cargo.toml version $v does not match tag ${GITHUB_REF_NAME}"; exit 1; }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build web UI
+        working-directory: web
+        run: npm ci && npm run build
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - run: sudo apt-get update && sudo apt-get install -y musl-tools
+      - name: Build
+        run: cargo build --release --locked --target ${{ matrix.target }} -p kodokuru
+      - name: Package
+        run: |
+          name=kodokuru-${{ matrix.arch }}-linux.tar.gz
+          mkdir pkg && cp target/${{ matrix.target }}/release/kodokuru pkg/
+          tar -C pkg -czf "$name" kodokuru
+          sha256sum "$name" | cut -d' ' -f1 > "$name.sha256"
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            kodokuru-${{ matrix.arch }}-linux.tar.gz
+            kodokuru-${{ matrix.arch }}-linux.tar.gz.sha256
+          generate_release_notes: true
