@@ -35,7 +35,9 @@ pub fn asset_name() -> String {
 pub async fn check_and_install(repo: &str, force: bool) -> Result<Outcome> {
     let exe = std::env::current_exe()?.canonicalize()?;
     let exe_s = exe.to_string_lossy();
-    if !force && (exe_s.contains("/target/debug/") || exe_s.contains("/target/release/")) {
+    let source_build = exe_s.contains("/target/debug/") || exe_s.contains("/target/release/");
+    // In a source checkout run through kodokuru.sh, git pull is the update.
+    if source_build && (!force || std::env::var_os("KODOKURU_LAUNCHER").is_some()) {
         let why = if std::env::var_os("KODOKURU_LAUNCHER").is_some() {
             "source checkout — kodokuru.sh keeps it up to date with git pull and rebuilds"
         } else {

@@ -15,13 +15,22 @@ Each **workspace** is an isolated, portable folder with its own agents, files, V
 ## Quick start (Linux)
 
 ```sh
-# Build (Rust 1.89+ and Node 20+)
-cd web && npm ci && npm run build && cd ..
-cargo build --release
-cp target/release/kodokuru ~/.local/bin/
-
-kodokuru start          # checks prerequisites, then runs in the background
+git clone https://github.com/effishen/KodoKuru.git
+cd KodoKuru
+./kodokuru.sh            # same as ./kodokuru.sh start
 ```
+
+`kodokuru.sh` is the only thing you run, the first time and every time after. Before handing over to the `kodokuru` binary it:
+
+1. updates the checkout (`git pull --ff-only`, skipped if you have local changes) and restarts itself if the launcher changed;
+2. installs missing system packages through `sudo apt-get`: build tools, git and curl, plus QEMU, `qemu-utils`, ssh and the SFTP server for VMs;
+3. adds you to the `kvm` group if needed and re-runs itself under that group, so you don't have to log out;
+4. installs Rust (rustup, your user only) and Node 22 (verified download into the cache) if they're missing or too old;
+5. rebuilds the web UI and the binary when the sources changed (the first build takes a few minutes; later starts take about a second).
+
+The binary then installs Lima into the cache, runs the prerequisite check, and starts in the background.
+
+All arguments are passed to `kodokuru` unchanged, so `./kodokuru.sh stop`, `./kodokuru.sh logs -f` and `./kodokuru.sh start --foreground --port 8443` all work. Two options are also honoured by the launcher itself: `--no-update` (no git pull, no release check) and `--no-doctor` (no package installs or prerequisite checks). Put it on your PATH with `ln -s "$PWD/kodokuru.sh" ~/.local/bin/kodokuru`.
 
 `start` prints the address (HTTPS with a self-signed certificate, port 7443) and, the first time, a **setup code**. Open the address, enter the code and choose your password. Save the recovery key it shows.
 
@@ -66,15 +75,44 @@ Global options: `--home DIR` (default `$KODOKURU_HOME` or `~/.local/share/kodoku
 
 ## VMs on Proxmox
 
-KodoKuru runs its VMs with Lima inside the KodoKuru machine. On a Proxmox guest, enable nested virtualization on the host and set the guest's CPU type to `host`. Then run `kodokuru doctor --fix` as your normal user (not root).
+KodoKuru runs its VMs with Lima inside the KodoKuru machine, so a Proxmox guest needs **nested virtualization**. You only do this once.
+
+**1. On the Proxmox host** (its shell, as root), check whether nesting is on:
+
+```sh
+cat /sys/module/kvm_intel/parameters/nested    # Intel CPU
+cat /sys/module/kvm_amd/parameters/nested      # AMD CPU
+```
+
+`Y` or `1` means it's on; skip to step 2. If you see `N` or `0`:
+
+```sh
+echo "options kvm-intel nested=Y" > /etc/modprobe.d/kvm-intel.conf   # Intel
+echo "options kvm-amd nested=1"   > /etc/modprobe.d/kvm-amd.conf     # AMD
+```
+
+Then shut down all VMs and reload the module (`modprobe -r kvm_intel && modprobe kvm_intel`, or `kvm_amd`), or simply reboot the host. Check again; it should say `Y`/`1`.
+
+**2. Set the KodoKuru VM's CPU type to `host`.** In the web UI: select the VM → **Hardware** → **Processors** → **Edit** → **Type: host**. Or on the host: `qm set <vmid> --cpu host`. Then **shut the VM down and start it again** from Proxmox; a reboot from inside the guest doesn't apply hardware changes.
+
+**3. Check inside the VM:**
+
+```sh
+grep -cE 'vmx|svm' /proc/cpuinfo   # more than 0
+ls -l /dev/kvm                     # exists
+```
+
+Run KodoKuru as your normal user, not root: Lima refuses to run as root. `kodokuru.sh` handles the `kvm` group and packages.
 
 ## Development
 
 ```sh
+./kodokuru.sh start --foreground --no-update   # build and run in the foreground
 cargo test --workspace
-cargo run -p kodokuru -- start --foreground --no-update
 cd web && npm run dev     # UI dev server proxying to https://127.0.0.1:7443
 ```
+
+Release binaries (from a `v*` tag) don't need the launcher: they update themselves from GitHub releases and install Lima on start. In a source checkout run through `kodokuru.sh`, git pull is the update mechanism.
 
 See [docs/DESIGN.md](docs/DESIGN.md) for the architecture and the decisions behind it.
 

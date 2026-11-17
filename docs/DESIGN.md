@@ -120,6 +120,7 @@ For Lima:
 
 ## Process model and updates
 
+- `kodokuru.sh` (repo root) is the launcher for source checkouts. It does `git pull --ff-only` (and re-execs itself if it changed), installs system packages via sudo/apt (build tools, QEMU, ssh, SFTP server), handles the `kvm` group (re-running under `sg kvm`), installs Rust via rustup and Node 22 into the cache (SHA-256 verified) when missing, rebuilds the web UI and binary when sources changed, then execs `kodokuru` with the original arguments. It reads but never consumes options; `--no-update` and `--no-doctor` are global flags of the binary, so they pass through to any subcommand.
 - `kodokuru start` runs the update check, then the prerequisite check (interactive prompts need a terminal), then re-launches itself detached (`setsid`) and waits until the port answers. `--foreground` is for development and systemd.
 - Updates come from GitHub releases (`kodokuru-<arch>-linux.tar.gz` + `.sha256`). The binary is verified, swapped atomically (previous kept as `kodokuru.prev`), and KodoKuru re-execs. Updates apply only at start; a restart doesn't lose work. Source builds skip the check.
 - SIGTERM/SIGINT pause runs without marking them stopped, so they resume next start.
